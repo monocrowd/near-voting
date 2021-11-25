@@ -117,3 +117,8 @@ TLDR Tutorial
          - near call $CONTRACT_NAME add_candidate '{"candidate_id": "Tom"}' --accountId $CONTRACT_NAME
       3. vote
          - near call $CONTRACT_NAME vote '{"candidate_id": "Tom"}' --accountId $VOTER_ACCOUNT_ID
+9. Deploy to your account once test completed
+   - config network and login
+      - `export NODE_ENV=testnet`
+      - `near login`
+   - `near deploy --wasmFile contract/target/wasm32-unknown-unknown/release/near_voting.wasm --accountId YOUR_ACCOUNT`
