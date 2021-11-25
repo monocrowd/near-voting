@@ -3,7 +3,6 @@ near-voting
 
 This [React] app was initialized with [create-near-app]
 
-
 Quick Start
 ===========
 
