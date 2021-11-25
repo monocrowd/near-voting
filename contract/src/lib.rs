@@ -1,4 +1,4 @@
-use near_sdk::collections::{LookupSet, UnorderedMap};
+use near_sdk::collections::{LookupMap, UnorderedMap};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{
     borsh::{self, BorshDeserialize, BorshSerialize},
@@ -21,24 +21,23 @@ pub struct Candidate {
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct Voting {
+pub struct VotingContract {
     candidates: UnorderedMap<CandidateId, Candidate>,
 
-    // store who already voted
-    voters: LookupSet<AccountId>,
+    votes: LookupMap<AccountId, CandidateId>,
 }
 
-impl Default for Voting {
+impl Default for VotingContract {
     fn default() -> Self {
         Self {
             candidates: UnorderedMap::new(b"c".to_vec()),
-            voters: LookupSet::new(b"v".to_vec()),
+            votes: LookupMap::new(b"v".to_vec()),
         }
     }
 }
 
 #[near_bindgen]
-impl Voting {
+impl VotingContract {
     pub fn add_candidate(
         &mut self,
         candidate_id: CandidateId,
@@ -61,14 +60,14 @@ impl Voting {
 
     pub fn vote(&mut self, candidate_id: CandidateId) {
         let voter = env::predecessor_account_id();
-        if self.voters.contains(&voter) {
+        if self.votes.get(&voter).is_some() {
             env::panic("you can only vote once".as_bytes());
         }
         match self.candidates.get(&candidate_id) {
             Some(mut candidate) => {
                 candidate.votes += 1;
                 self.candidates.insert(&candidate_id, &candidate);
-                self.voters.insert(&voter);
+                self.votes.insert(&voter, &candidate_id);
             }
             None => env::panic(format!("candidate {} not exists", candidate_id).as_bytes()),
         }
