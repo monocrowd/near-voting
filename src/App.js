@@ -68,7 +68,7 @@ export default function App() {
           {' '/* React trims whitespace around tags; insert literal space character when needed */}
           {window.accountId}!
         </h1>
-        <CandidateList candidates={candidates} />
+        <CandidateList candidates={candidates} set_candidates={set_candidates} />
         <form onSubmit={async event => {
           event.preventDefault()
 
@@ -86,16 +86,17 @@ export default function App() {
             await window.contract.add_candidate({
               // pass the value that the user entered in the greeting field
               candidate_id: newCandidate
+            }).then(() => {
+              window.contract.view_candidates({ accountId: window.accountId })
+              .then(result => {
+                set_candidates(result)
+              })    
             })
           } catch (e) {
             alert(e)
           } finally {
             // re-enable the form, whether the call succeeded or failed
-            fieldset.disabled = false
-            window.contract.view_candidates({ accountId: window.accountId })
-            .then(result => {
-              set_candidates(result)
-            })            
+            fieldset.disabled = false        
           }
         }}>
           <fieldset id="fieldset">
@@ -131,27 +132,28 @@ export default function App() {
   )
 }
 
-function CandidateList({ candidates }) {
+function CandidateList({ candidates, set_candidates }) {
   const [buttonDisabled, setButtonDisabled] = React.useState(false)
 
-  const onClick = async (id) => {
-    console.log(id)
+  const onClick = async (event, id) => {
+    event.preventDefault();
     setButtonDisabled(true)
     try {
       // make an update call to the smart contract
       await window.contract.vote({
         // pass the value that the user entered in the greeting field
         candidate_id: id
+      }).then(() => {
+        window.contract.view_candidates({ accountId: window.accountId })
+        .then(result => {
+          set_candidates(result)
+        })    
       })
     } catch (e) {
       alert(e)
     } finally {
       // re-enable the form, whether the call succeeded or failed
       setButtonDisabled(false)
-      window.contract.view_candidates({ accountId: window.accountId })
-      .then(result => {
-        set_candidates(result)
-      })      
     }
   }
 
@@ -163,7 +165,7 @@ function CandidateList({ candidates }) {
           <div style={{ display: 'flex' }}>
             <button
               style={{ borderRadius: '5px 5px 5px 5px' }}
-              onClick={() => onClick(c.candidate_id)}
+              onClick={(event) => onClick(event, c.candidate_id)}
               disabled={buttonDisabled}
             >
               Vote
