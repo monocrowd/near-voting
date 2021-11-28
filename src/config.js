@@ -1,4 +1,4 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME ||'near-voting'
+const CONTRACT_NAME = process.env.CONTRACT_NAME ||'voting.happybits.testnet'
 
 function getConfig(env) {
   switch (env) {
