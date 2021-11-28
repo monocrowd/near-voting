@@ -92,12 +92,11 @@ export default function App() {
           } finally {
             // re-enable the form, whether the call succeeded or failed
             fieldset.disabled = false
-          }
-
-          window.contract.view_candidates({ accountId: window.accountId })
+            window.contract.view_candidates({ accountId: window.accountId })
             .then(result => {
               set_candidates(result)
-            })
+            })            
+          }
         }}>
           <fieldset id="fieldset">
             <label
@@ -149,6 +148,10 @@ function CandidateList({ candidates }) {
     } finally {
       // re-enable the form, whether the call succeeded or failed
       setButtonDisabled(false)
+      window.contract.view_candidates({ accountId: window.accountId })
+      .then(result => {
+        set_candidates(result)
+      })      
     }
   }
 
@@ -158,18 +161,25 @@ function CandidateList({ candidates }) {
       <ul>{candidates.map(c => (
         <li style={{ display: 'flex' }} key={c.candidate_id}>
           <div style={{ display: 'flex' }}>
-            <input
-              autoComplete="off"
-              defaultValue={c.candidate_id}
-              style={{ flex: 1 }}
-            />
             <button
-              style={{ borderRadius: '0 5px 5px 0' }}
+              style={{ borderRadius: '5px 5px 5px 5px' }}
               onClick={() => onClick(c.candidate_id)}
               disabled={buttonDisabled}
             >
               Vote
-            </button>
+            </button>            
+            <input
+              autoComplete="off"
+              value={c.candidate_id}
+              readOnly={true}
+              style={{ flex: 1 }}
+            />
+            <input
+              autoComplete="off"
+              value={`${c.votes} votes`}
+              readOnly={true}
+              style={{ flex: 1 }}
+            />
           </div>
         </li>
       ))}</ul>

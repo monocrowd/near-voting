@@ -72,4 +72,8 @@ impl VotingContract {
             None => env::panic(format!("candidate {} not exists", candidate_id).as_bytes()),
         }
     }
+
+    pub fn my_vote(&self, account_id: AccountId) -> Option<CandidateId> {
+        self.votes.get(&account_id)
+    }
 }
